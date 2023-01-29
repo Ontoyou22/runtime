@@ -111,7 +111,7 @@ build_native()
         buildTool="make"
     fi
 
-    if [[ "$__IsCI" == 1 && "$targetOs" == "linux" ]]; then
+    if [[ "$__IsCI" == 1 && "$__TargetOS" == "linux" ]]; then
         if [[ -z "$USE_SCCACHE" ]]; then
             export USE_SCCACHE=true
             export PATH="$PATH:$__RepoRootDir/eng/native/sccache"
