@@ -111,6 +111,19 @@ build_native()
         buildTool="make"
     fi
 
+    if [[ "$__IsCI" == 1 ]]; then
+        if [[ -z "$USE_SCCACHE" ]]; then
+            export USE_SCCACHE=true
+            export PATH="$PATH:$__RepoRootDir/eng/native/sccache"
+            export SCCACHE_AZURE_CONNECTION_STRING="BlobEndpoint=https://dnruntimesccache.blob.core.windows.net/"
+            export SCCACHE_AZURE_BLOB_CONTAINER=sccache-test
+        fi
+    fi
+
+    if [[ "$USE_SCCACHE" == "true" ]]; then
+        cmakeArgs="-DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache $cmakeArgs"
+    fi
+
     if [[ "$__SkipConfigure" == 0 ]]; then
 
         if [[ "$__StaticAnalyzer" == 1 ]]; then
@@ -184,6 +197,9 @@ build_native()
     CFLAGS="${SAVED_CFLAGS}"
     CXXFLAGS="${SAVED_CXXFLAGS}"
     LDFLAGS="${SAVED_LDFLAGS}"
+
+    # Print sccache stats
+    sccache -s
 
     if [[ "$exit_code" != 0 ]]; then
         echo "${__ErrMsgPrefix}Failed to build \"$message\"."
@@ -300,6 +316,7 @@ while :; do
             ;;
 
         ci|-ci)
+            __IsCI=1
             __ArcadeScriptArgs="--ci"
             __ErrMsgPrefix="##vso[task.logissue type=error]"
             ;;
