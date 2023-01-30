@@ -198,8 +198,10 @@ build_native()
     CXXFLAGS="${SAVED_CXXFLAGS}"
     LDFLAGS="${SAVED_LDFLAGS}"
 
-    # Print sccache stats
-    sccache -s
+    if [[ "$USE_SCCACHE" == "true" ]]; then
+        # Print sccache stats
+        sccache -s
+    fi
 
     if [[ "$exit_code" != 0 ]]; then
         echo "${__ErrMsgPrefix}Failed to build \"$message\"."
